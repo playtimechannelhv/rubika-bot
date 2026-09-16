@@ -1,6 +1,7 @@
 from robobot import Bot
 import os
 
+# توکن ربات شما
 TOKEN = "CEGCFA0REVCEGJFCSSXVQIZWKYPFYXYFGDCKBNEZCTXOMJJYOGZMTNEJHEHFQHMB"
 bot = Bot(TOKEN)
 
@@ -19,8 +20,8 @@ async def main():
     # Render خودش پورت رو ست میکنه، ما ازش میخونیم
     port = int(os.environ.get("PORT", 8080))
     
-    # ⚠️ این آدرس رو بعد از دیپلوی روی Render باید با آدرس خودت عوض کنی
-    webhook_url = "https://your-app.onrender.com" 
+    # آدرس اختصاصی ربات شما در Render (بدون / در انتها)
+    webhook_url = "https://rubika-bot-f020.onrender.com"
     
     print("⏳ در حال اتصال به روبیکا...")
     
@@ -32,7 +33,7 @@ async def main():
         )
         print("✅ وب‌هوک با موفقیت ثبت شد!")
     except Exception as e:
-        print(f"⚠️ خطا در ثبت وب‌هوک (ممکنه بعدا درست بشه): {e}")
+        print(f"⚠️ خطا در ثبت وب‌هوک: {e}")
     
     # استارت زدن سرور
     await bot.start(
