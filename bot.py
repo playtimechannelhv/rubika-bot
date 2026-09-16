@@ -1,8 +1,9 @@
 from robobot import Bot
 from aiohttp import web
 import os
-import threading
+import asyncio
 
+# توکن ربات شما
 TOKEN = "CEGCFA0REVCEGJFCSSXVQIZWKYPFYXYFGDCKBNEZCTXOMJJYOGZMTNEJHEHFQHMB"
 bot = Bot(TOKEN)
 
@@ -17,18 +18,26 @@ async def auto_react(bot, event):
     except Exception as e:
         print(f"❌ خطا: {type(e).__name__}: {e}")
 
+# وب سرور برای اینکه Render فکر کنه یه سرویس فعاله
 async def handle(request):
     return web.Response(text="Bot is running!")
 
-def run_web_server():
+async def start_web_server():
     app = web.Application()
     app.router.add_get('/', handle)
     port = int(os.environ.get("PORT", 8080))
-    web.run_app(app, host='0.0.0.0', port=port)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, '0.0.0.0', port)
+    await site.start()
+    print(f"✅ Web server started on port {port}")
+
+async def main():
+    # اجرای همزمان وب سرور و ربات توی یه ترد اصلی
+    await asyncio.gather(
+        start_web_server(),
+        bot.run()
+    )
 
 if __name__ == "__main__":
-    server_thread = threading.Thread(target=run_web_server)
-    server_thread.daemon = True
-    server_thread.start()
-    print("Starting bot polling...")
-    bot.run()
+    asyncio.run(main())
