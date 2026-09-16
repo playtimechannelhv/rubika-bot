@@ -9,14 +9,18 @@ bot = Bot(TOKEN)
 
 @bot.on_message()
 async def auto_react(bot, event):
-    # در حالت Polling، event مستقیماً خود پیامه
-    if event.text and not event.is_me:
-        print(f"📩 پیام جدید: {event.text}")
-        try:
-            await bot.react(event.chat_id, event.message_id, "👍")
+    try:
+        # ۱. پیام اصلی رو از داخل پاکت در میاریم
+        msg = event.new_message
+        
+        # ۲. چک میکنیم پیام متنی باشه و از طرف خود ربات نباشه
+        # توی API روبیکا، پیام‌های کاربر sender_type = "User" دارن
+        if msg and msg.text and msg.sender_type == "User":
+            print(f"📩 پیام جدید: {msg.text}")
+            await bot.react(event.chat_id, msg.message_id, "👍")
             print("✅ ری‌اکشن فرستاده شد!")
-        except Exception as e:
-            print(f"❌ خطا: {e}")
+    except Exception as e:
+        print(f"❌ خطا: {type(e).__name__}: {e}")
 
 # وب سرور ساده برای اینکه Render فکر کنه یه وب سرویس معمولیه
 async def handle(request):
@@ -29,11 +33,8 @@ def run_web_server():
     web.run_app(app, host='0.0.0.0', port=port)
 
 if __name__ == "__main__":
-    # وب سرور رو توی یه ترد جداگانه اجرا میکنیم تا Render راضی باشه
     server_thread = threading.Thread(target=run_web_server)
     server_thread.daemon = True
     server_thread.start()
-    
-    # ربات رو با Polling اجرا میکنیم (مثل Termux)
     print("Starting bot polling...")
     bot.run()
